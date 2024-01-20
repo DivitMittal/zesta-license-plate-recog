@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "happy-orange-churros",
+    "slug": "snack-88b1c545-d346-4afb-b737-c8cef3f03b1a",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zesta.lpr"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.zesta.lpr"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
