@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Header } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Camera } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
+import { encode } from "base-64";
 
-export default function App() {
+const App = () => {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [camera, setCamera] = useState(null);
@@ -17,7 +18,29 @@ export default function App() {
         })();
     };
 
+    const stWebSocket = () => {
+        const ws = new WebSocket("ws://192.168.84.177:2121/");
+        ws.onopen = () => {
+            // Connection opened
+            console.log("WebSocket connection opened");
+            ws.send("Hello, server!"); // Send a message to the server
+        };
+        ws.onmessage = (e) => {
+            // Receive a message from the server
+            console.log(e.data);
+        };
+        ws.onerror = (e) => {
+            // An error occurred
+            console.log(e.message);
+        };
+        ws.onclose = (e) => {
+            // Connection closed
+            console.log(e.code, e.reason);
+        };
+    };
+
     useEffect(reqPermCam, []);
+    useEffect(stWebSocket, []);
 
     if (hasPermission === null) {
         return <View />;
@@ -27,7 +50,6 @@ export default function App() {
         return <Text>No access to camera</Text>;
     }
 
-    // Methods
     const takePicture = async () => {
         if (camera) {
             const photo = await camera.takePictureAsync(null);
@@ -47,75 +69,59 @@ export default function App() {
         }
     };
 
-    const uploadImageToServer = async (imageUri) => {
-        try {
-            const formData = new FormData();
-            formData.append("image", {
-                uri: imageUri,
-                type: "image/jpeg",
-                name: "photo.jpg",
-            });
-
-            const response = await fetch("http://192.168.84.177/upload", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            if (response.ok) {
-                console.log("Image uploaded successfully to the server!");
-            } else {
-                console.log("Failed to upload image to the server");
-            }
-        } catch (error) {
-            console.error("Error uploading image:", error);
-        }
-    };
-
-    const saveImages = async () => {
-        // Upload each image in imageArray to the server
-        for (const imageUri of imageArray) {
-            await uploadImageToServer(imageUri);
-        }
-        console.log("Images saved!");
-    };
-
     const discardImage = (imageUri) => {
+        // Remove the discarded image from the array
         const updatedImageArray = imageArray.filter((uri) => uri !== imageUri);
         setImageArray(updatedImageArray);
 
+        // Delete the image file from the directory
         FileSystem.deleteAsync(imageUri, { idempotent: true });
     };
 
-    // JSON Object & variables
+    const saveImages = async () => {
+        // Perform any additional actions before saving images if needed
+        console.log("Images saved!");
+    };
+
     const Options = [
-        { id: 1, type: "MH 12 DE 1433", owner: "Attamaram Bhide, Maharashtra" },
         { id: 2, type: "HR 26 DQ 5551", owner: "Divjot Singh, Haryana" },
         { id: 3, type: "DL 28 GE 6887", owner: "Divit Mittal, Delhi" },
     ];
 
     const darkGradientColors = ["#0F0F0F", "#1A1A1A"];
 
-    // Styles
     const styles = StyleSheet.create({
         container: {
             flex: 1,
             justifyContent: "flex-end",
+            borderRadius: 5,
             alignItems: "center",
+            marginTop: 30,
+        },
+        logo: {
+            width: 100,
+            height: 110,
+            margin: 10,
+            marginTop: 20,
+        },
+        zestaText: {
+            fontSize: 24,
+            fontWeight: "bold",
+            color: "white",
+            marginBottom: 10,
         },
         cameraContainer: {
-            flex: 0.5,
-            height: "100%",
-            width: "150%",
-            aspectRatio: 1 / 1,
-            borderRadius: 20,
+            flex: 1,
+            margin: 10,
+            height: "70%",
+            width: "90%",
+            borderRadius: 50,
             overflow: "hidden",
+            marginTop: 0,
         },
         optionsContainer: {
             backgroundColor: "rgba(0, 0, 0, 0.5)",
-            padding: 5,
+            padding: 10,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             width: "100%",
@@ -132,9 +138,6 @@ export default function App() {
             borderRadius: 8,
             padding: 10,
             marginBottom: 10,
-        },
-        selectedOption: {
-            backgroundColor: "lightblue",
         },
         optionType: {
             fontSize: 18,
@@ -173,32 +176,27 @@ export default function App() {
             color: "white",
             fontSize: 14,
         },
-        logo: {
-            width: 100,
-            height: 100,
-            resizeMode: 'cover',
-            alignSelf: 'flex-start',
-            margin: 10,
-        },
-        headerContainer: {
-            display: 'flex',
-            flex: 0.25,
-            backgroundColor: "green",
-        }
     });
 
     return (
         <LinearGradient colors={darkGradientColors} style={{ flex: 1 }}>
             <View style={styles.container}>
-                <Image source={require('./assets/logo_icon.png')} style={styles.logo} />
-                <Text style={{ color: 'white' }}> Zesta - Automatic License Plate </Text>
+                {/* Add the logo image */}
+                <Image
+                    source={require("./assets/logo.png")}
+                    style={styles.logo}
+                />
+
+                {/* Add the ZESTA text */}
+                <Text style={styles.zestaText}>ZESTA</Text>
+
                 <View style={styles.cameraContainer}>
                     <Camera
                         style={{
                             flex: 1,
                             borderWidth: 3,
-                            borderColor: "white",
-                            borderRadius: 35,
+                            borderColor: "black",
+                            borderRadius: 20,
                             overflow: "hidden",
                         }}
                         type={type}
@@ -231,10 +229,7 @@ export default function App() {
 
                 <View style={styles.optionsContainer}>
                     {Options.map((option) => (
-                        <TouchableOpacity
-                            key={option.id}
-                            style={[styles.option]}
-                        >
+                        <TouchableOpacity key={option.id} style={styles.option}>
                             <Text
                                 style={[
                                     styles.optionType,
@@ -297,8 +292,9 @@ export default function App() {
                         <Text style={styles.CarText}>Save Images</Text>
                     </TouchableOpacity>
                 )}
-
             </View>
         </LinearGradient>
     );
-}
+};
+
+export default App;
