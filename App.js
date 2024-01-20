@@ -21,20 +21,16 @@ const App = () => {
     const stWebSocket = () => {
         const ws = new WebSocket("ws://192.168.84.177:2121/");
         ws.onopen = () => {
-            // Connection opened
             console.log("WebSocket connection opened");
-            ws.send("Hello, server!"); // Send a message to the server
+            ws.send("Hello, server!");
         };
         ws.onmessage = (e) => {
-            // Receive a message from the server
             console.log(e.data);
         };
         ws.onerror = (e) => {
-            // An error occurred
             console.log(e.message);
         };
         ws.onclose = (e) => {
-            // Connection closed
             console.log(e.code, e.reason);
         };
     };
@@ -55,7 +51,6 @@ const App = () => {
             const photo = await camera.takePictureAsync(null);
             const asset = await FileSystem.getInfoAsync(photo.uri);
 
-            // Save image to project's data directory
             const newImageUri = `${
                 FileSystem.documentDirectory
             }${Date.now()}.jpg`;
@@ -70,16 +65,13 @@ const App = () => {
     };
 
     const discardImage = (imageUri) => {
-        // Remove the discarded image from the array
         const updatedImageArray = imageArray.filter((uri) => uri !== imageUri);
         setImageArray(updatedImageArray);
 
-        // Delete the image file from the directory
         FileSystem.deleteAsync(imageUri, { idempotent: true });
     };
 
     const saveImages = async () => {
-        // Perform any additional actions before saving images if needed
         console.log("Images saved!");
     };
 
@@ -181,13 +173,10 @@ const App = () => {
     return (
         <LinearGradient colors={darkGradientColors} style={{ flex: 1 }}>
             <View style={styles.container}>
-                {/* Add the logo image */}
                 <Image
                     source={require("./assets/logo.png")}
                     style={styles.logo}
                 />
-
-                {/* Add the ZESTA text */}
                 <Text style={styles.zestaText}>ZESTA</Text>
 
                 <View style={styles.cameraContainer}>
