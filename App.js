@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Camera } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
-import { encode } from "base-64";
 
 const App = () => {
     const [hasPermission, setHasPermission] = useState(null);
@@ -18,11 +17,10 @@ const App = () => {
         })();
     };
 
+    const ws = new WebSocket("ws://192.168.84.177:2121/");
     const stWebSocket = () => {
-        const ws = new WebSocket("ws://192.168.84.177:2121/");
         ws.onopen = () => {
             console.log("WebSocket connection opened");
-            ws.send("Hello, server!");
         };
         ws.onmessage = (e) => {
             console.log(e.data);
@@ -51,9 +49,8 @@ const App = () => {
             const photo = await camera.takePictureAsync(null);
             const asset = await FileSystem.getInfoAsync(photo.uri);
 
-            const newImageUri = `${
-                FileSystem.documentDirectory
-            }${Date.now()}.jpg`;
+            const newImageUri = `${FileSystem.documentDirectory}${Date.now()}.jpg`;
+
             await FileSystem.moveAsync({
                 from: asset.uri,
                 to: newImageUri,
@@ -64,6 +61,17 @@ const App = () => {
         }
     };
 
+    async function getBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = () => {
+            resolve(reader.result)
+          }
+          reader.onerror = reject
+        })
+    };
+
     const discardImage = (imageUri) => {
         const updatedImageArray = imageArray.filter((uri) => uri !== imageUri);
         setImageArray(updatedImageArray);
@@ -71,9 +79,28 @@ const App = () => {
         FileSystem.deleteAsync(imageUri, { idempotent: true });
     };
 
-    const saveImages = async () => {
-        console.log("Images saved!");
+    const encImage = async (uri) => {
+        try {
+            const base64String = await FileSystem.readAsStringAsync(uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+            return base64String;
+        } catch (error) {
+            console.error("Error reading image:", error);
+            throw error;
+        }
     };
+
+    const saveImages = async () => {
+        try {
+            const imageUri = imageArray[imageArray.length-1];
+            const base64String = await encImage(imageUri);
+            ws.send(base64String);
+        } catch (error) {
+            console.error("Error saving images:", error);
+        }
+    };
+
 
     const Options = [
         { id: 2, type: "HR 26 DQ 5551", owner: "Divjot Singh, Haryana" },
