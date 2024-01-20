@@ -6,7 +6,7 @@ Swift license plate recognition deep learning model with a cross-platform(mobile
 ---
 
 ### Team Members
-- [Divit Mittal(Team Leader)](https://github.com/DivitMittal)
+- [Divit Mittal (Team Leader)](https://github.com/DivitMittal)
 - Divyendu Sigh Bhati
 - Mohd. Ramin Zaheer
 
