@@ -7,6 +7,12 @@ name = "pypi"
 opencv-python = "*"
 tensorflow = "*"
 keras = "*"
+scikit-learn = "*"
+easyocr = "*"
+flask = "*"
+flask-restful = "*"
+axios = "*"
+tornado = "*"
 
 [dev-packages]
 matplotlib = "*"
