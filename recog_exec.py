@@ -20,3 +20,4 @@ for license_plate in license_plates.boxes.data.tolist():
 reader = easyocr.Reader(['en'], gpu=False)
 result = reader.readtext(license_plate_crop)
 print(result[0][1])
+

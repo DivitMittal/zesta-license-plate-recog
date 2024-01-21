@@ -19,7 +19,7 @@ const App = () => {
             owner: "",
             imageSource: exampleImageUri,
         },
-        { id: 2, type: lID, owner: "Divit Mittal, Delhi" },
+        { id: 2, type: lID, owner: "Divit Mittal, Delhi\n\nPollution Check: Valid\nValid Insurance: Expired\nCriminal Record: Clean" },
     ]);
 
     const reqPermCam = () => {
@@ -29,7 +29,7 @@ const App = () => {
         })();
     };
 
-    const ws = new WebSocket("ws://192.168.84.177:2121/");
+    const ws = new WebSocket("ws://192.168.61.177:2121/");
     const stWebSocket = () => {
         ws.onopen = () => {
             console.log("WebSocket connection opened");
@@ -96,11 +96,6 @@ const App = () => {
             clickImgURI = imageArray[imageArray.length - 1];
             const base64String = await encImage(clickImgURI);
             ws.send(base64String);
-
-            ws.onmessage = (e) => {
-                const updatedlID = e.data;
-                setlID(updatedlID);
-            }
 
             const updatedOptions = [...Options];
             updatedOptions[0] = {
