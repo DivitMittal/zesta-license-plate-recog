@@ -3,12 +3,23 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Camera } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
+import fortu from "./assets/fortu.jpeg";
 
 const App = () => {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [camera, setCamera] = useState(null);
     const [imageArray, setImageArray] = useState([]);
+    const exampleImageUri = Image.resolveAssetSource(fortu).uri;
+    const [Options, setOptions] = useState([
+        {
+            id: 2,
+            type: "HR 26 DQ 5551",
+            owner: "Divjot Singh, Haryana",
+            imageSource: exampleImageUri,
+        },
+        { id: 3, type: "DL 28 GE 6887", owner: "Divit Mittal, Delhi" },
+    ]);
 
     const reqPermCam = () => {
         (async () => {
@@ -84,23 +95,24 @@ const App = () => {
 
     const saveImages = async () => {
         try {
-            const imageUri = imageArray[imageArray.length - 1];
-            const base64String = await encImage(imageUri);
+            clickImgURI = imageArray[imageArray.length - 1];
+
+            const updatedOptions = [...Options];
+            updatedOptions[0] = {
+                id: 2,
+                type: "DL9CAP0941",
+                owner: "Divit King",
+                imageSource: clickImgURI,
+            };
+
+            setOptions(updatedOptions);
+
+            const base64String = await encImage(clickImgURI);
             ws.send(base64String);
         } catch (error) {
             console.error("Error saving images:", error);
         }
     };
-
-    const Options = [
-        {
-            id: 2,
-            type: "HR 26 DQ 5551",
-            owner: "Divjot Singh, Haryana",
-            imageSource: require("./dataset/fortu.jpeg"),
-        },
-        { id: 3, type: "DL 28 GE 6887", owner: "Divit Mittal, Delhi" },
-    ];
 
     const darkGradientColors = ["#0F0F0F", "#1A1A1A"];
 
@@ -249,6 +261,17 @@ const App = () => {
                             >
                                 {option.type}
                             </Text>
+                            {option.imageSource && (
+                                <Image
+                                    source={{ uri: option.imageSource }}
+                                    style={{
+                                        width: 150,
+                                        height: 110,
+                                        marginBottom: 1,
+                                        borderRadius: 10,
+                                    }}
+                                />
+                            )}
                             <Text
                                 style={[
                                     styles.optionOwner,
@@ -257,16 +280,6 @@ const App = () => {
                             >
                                 {option.owner}
                             </Text>
-                            {option.imageSource && (
-                                <Image
-                                    source={option.imageSource}
-                                    style={{
-                                        width: 150,
-                                        height: 110,
-                                        marginBottom: 5,
-                                    }}
-                                />
-                            )}
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -310,7 +323,9 @@ const App = () => {
                         style={styles.CarButton}
                         onPress={saveImages}
                     >
-                        <Text style={styles.CarText}>Save Images</Text>
+                        <Text style={styles.CarText}>
+                            Send to server for evaluation!!
+                        </Text>
                     </TouchableOpacity>
                 )}
             </View>

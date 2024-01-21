@@ -1,5 +1,4 @@
 import { WebSocketServer } from "ws";
-import { decode } from "base64-arraybuffer";
 import fs from "fs";
 
 const saveBase64 = (strData) => {
@@ -19,3 +18,4 @@ wss.on("connection", function connection(ws) {
         saveBase64(base64String);
     });
 });
+
