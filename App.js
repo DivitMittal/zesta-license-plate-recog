@@ -49,7 +49,9 @@ const App = () => {
             const photo = await camera.takePictureAsync(null);
             const asset = await FileSystem.getInfoAsync(photo.uri);
 
-            const newImageUri = `${FileSystem.documentDirectory}${Date.now()}.jpg`;
+            const newImageUri = `${
+                FileSystem.documentDirectory
+            }${Date.now()}.jpg`;
 
             await FileSystem.moveAsync({
                 from: asset.uri,
@@ -59,17 +61,6 @@ const App = () => {
             const newImageArray = [...imageArray, newImageUri];
             setImageArray(newImageArray);
         }
-    };
-
-    async function getBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader()
-          reader.readAsDataURL(file)
-          reader.onload = () => {
-            resolve(reader.result)
-          }
-          reader.onerror = reject
-        })
     };
 
     const discardImage = (imageUri) => {
@@ -93,7 +84,7 @@ const App = () => {
 
     const saveImages = async () => {
         try {
-            const imageUri = imageArray[imageArray.length-1];
+            const imageUri = imageArray[imageArray.length - 1];
             const base64String = await encImage(imageUri);
             ws.send(base64String);
         } catch (error) {
@@ -101,9 +92,13 @@ const App = () => {
         }
     };
 
-
     const Options = [
-        { id: 2, type: "HR 26 DQ 5551", owner: "Divjot Singh, Haryana" },
+        {
+            id: 2,
+            type: "HR 26 DQ 5551",
+            owner: "Divjot Singh, Haryana",
+            imageSource: require("./dataset/fortu.jpeg"),
+        },
         { id: 3, type: "DL 28 GE 6887", owner: "Divit Mittal, Delhi" },
     ];
 
@@ -262,6 +257,16 @@ const App = () => {
                             >
                                 {option.owner}
                             </Text>
+                            {option.imageSource && (
+                                <Image
+                                    source={option.imageSource}
+                                    style={{
+                                        width: 150,
+                                        height: 110,
+                                        marginBottom: 5,
+                                    }}
+                                />
+                            )}
                         </TouchableOpacity>
                     ))}
                 </View>
