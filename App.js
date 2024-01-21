@@ -11,14 +11,15 @@ const App = () => {
     const [camera, setCamera] = useState(null);
     const [imageArray, setImageArray] = useState([]);
     const exampleImageUri = Image.resolveAssetSource(fortu).uri;
+    const [lID, setlID] = useState("DL9CAP0941")
     const [Options, setOptions] = useState([
         {
-            id: 2,
-            type: "HR 26 DQ 5551",
-            owner: "Divjot Singh, Haryana",
+            id: 1,
+            type: "Captured Image",
+            owner: "",
             imageSource: exampleImageUri,
         },
-        { id: 3, type: "DL 28 GE 6887", owner: "Divit Mittal, Delhi" },
+        { id: 2, type: lID, owner: "Divit Mittal, Delhi" },
     ]);
 
     const reqPermCam = () => {
@@ -32,9 +33,6 @@ const App = () => {
     const stWebSocket = () => {
         ws.onopen = () => {
             console.log("WebSocket connection opened");
-        };
-        ws.onmessage = (e) => {
-            console.log(e.data);
         };
         ws.onerror = (e) => {
             console.log(e.message);
@@ -93,22 +91,33 @@ const App = () => {
         }
     };
 
-    const saveImages = async () => {
+    const saveImages = async (lID) => {
         try {
             clickImgURI = imageArray[imageArray.length - 1];
+            const base64String = await encImage(clickImgURI);
+            ws.send(base64String);
+
+            ws.onmessage = (e) => {
+                const updatedlID = e.data;
+                setlID(updatedlID);
+            }
 
             const updatedOptions = [...Options];
             updatedOptions[0] = {
+                id: 1,
+                type: "Captured Image",
+                owner: "",
+                imageSource: clickImgURI,
+            };
+
+            updatedOptions[1] = {
                 id: 2,
                 type: "DL9CAP0941",
-                owner: "Divit King",
-                imageSource: clickImgURI,
+                owner: "Ramin, Delhi",
             };
 
             setOptions(updatedOptions);
 
-            const base64String = await encImage(clickImgURI);
-            ws.send(base64String);
         } catch (error) {
             console.error("Error saving images:", error);
         }
@@ -168,10 +177,11 @@ const App = () => {
         optionType: {
             fontSize: 18,
             fontWeight: "bold",
+            color: 'red',
         },
         optionOwner: {
-            marginTop: 50,
-            color: "green",
+            marginTop: 0,
+            color: "black",
         },
         CarButton: {
             backgroundColor: "green",
@@ -256,7 +266,7 @@ const App = () => {
                             <Text
                                 style={[
                                     styles.optionType,
-                                    option.id === 3 && { color: "red" },
+                                    option.id === 1 && { color: "black" },
                                 ]}
                             >
                                 {option.type}
