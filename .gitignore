@@ -1,5 +1,8 @@
 # Customized gitignore for current python & react-native(expo) project
 
+# yarn & npm lock files
+*.lock
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
